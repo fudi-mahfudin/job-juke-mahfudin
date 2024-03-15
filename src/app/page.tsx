@@ -15,7 +15,7 @@ export default async function Product() {
   const products: Product[] = await getProducts();
 
   return (
-    <main className="py-10 px-10">
+    <div className="py-10 px-10">
       <div className="py-2">
         <AddProduct />
       </div>
@@ -49,6 +49,6 @@ export default async function Product() {
           ))}
         </tbody>
       </table>
-    </main>
+    </div>
   );
 }
