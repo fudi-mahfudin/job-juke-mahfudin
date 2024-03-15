@@ -1,16 +1,33 @@
 "use client";
 
-import { SyntheticEvent, useState } from "react";
+import { SyntheticEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Category } from "@/types/product";
 
 export default function AddProduct() {
   const [title, setTitle] = useState("");
   const [price, setPrice] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [category, setCategory] = useState<number | undefined>(undefined);
   const [description, setDescription] = useState("");
+  const [categories, setCategories] = useState<Category[]>([]);
   const [modal, setModal] = useState(false);
   const [isMutating, setIsMutating] = useState(false);
 
   const router = useRouter();
+
+  useEffect(() => {
+    async function getCategories() {
+      const res = await fetch(`https://api.escuelajs.co/api/v1/categories`);
+
+      const fetchedCategories: Category[] = await res.json();
+      if (fetchedCategories) {
+        setCategories(fetchedCategories);
+      }
+    }
+
+    getCategories();
+  }, []);
 
   async function handleSubmit(e: SyntheticEvent) {
     e.preventDefault();
@@ -26,10 +43,8 @@ export default function AddProduct() {
         title: title,
         price: price,
         description: description,
-        categoryId: 7,
-        images: [
-          "https://c8.alamy.com/compes/r3yw81/el-icono-de-imagen-no-disponible-vector-plana-r3yw81.jpg",
-        ],
+        categoryId: category,
+        images: [imageUrl],
       }),
     });
 
@@ -37,6 +52,8 @@ export default function AddProduct() {
 
     setTitle("");
     setPrice("");
+    setCategory(undefined);
+    setImageUrl("");
     setDescription("");
     router.refresh();
     setModal(false);
@@ -67,6 +84,7 @@ export default function AddProduct() {
               <label className="label font-bold">Title</label>
               <input
                 type="text"
+                required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="input w-full input-bordered"
@@ -77,6 +95,7 @@ export default function AddProduct() {
               <label className="label font-bold">Price</label>
               <input
                 type="text"
+                required
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
                 className="input w-full input-bordered"
@@ -84,13 +103,37 @@ export default function AddProduct() {
               />
             </div>
             <div className="form-control">
-              <label className="label font-bold">Price</label>
+              <label className="label font-bold">Category</label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(Number(e.target.value))}
+                className="select select-bordered w-full max-w-xs"
+              >
+                {categories?.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="form-control">
+              <label className="label font-bold">Description</label>
               <textarea
                 value={description}
                 rows={4}
                 onChange={(e) => setDescription(e.target.value)}
                 className="textarea textarea-bordered"
                 placeholder="Description"
+              />
+            </div>
+            <div className="form-control">
+              <label className="label font-bold">Image Link</label>
+              <input
+                type="url"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+                className="input w-full input-bordered"
+                placeholder="https://api.lorem.space/image/fashion?w=640&h=480&r=4278"
               />
             </div>
             <div className="modal-action">

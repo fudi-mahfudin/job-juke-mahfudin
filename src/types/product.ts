@@ -8,7 +8,7 @@ export interface Product {
   updatedAt: string;
   category: Category;
 }
-interface Category {
+export interface Category {
   id: number;
   name: string;
   image: string;

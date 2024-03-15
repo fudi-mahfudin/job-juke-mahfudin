@@ -1,17 +1,9 @@
 import DeleteProduct from "@/app/deleteProduct";
 import UpdateProduct from "@/app/updateProduct";
+import { cleanUrl, isValidUrl } from "@/libs/helper";
 import { Product } from "@/types/product";
 import Image from "next/image";
 import Link from "next/link";
-
-function isValidUrl(string: string) {
-  try {
-    new URL(string);
-    return true;
-  } catch (err) {
-    return false;
-  }
-}
 
 async function getProductDetail(id: number) {
   const res = await fetch(`https://api.escuelajs.co/api/v1/products/${id}`, {
@@ -28,9 +20,9 @@ export default async function ProductDetail({
   const product: Product = await getProductDetail(Number(params.id));
 
   if (!product) return;
-  let imageUrl = product.images[0];
+  let imageUrl = product?.images?.[0];
   if (!isValidUrl(imageUrl)) {
-    imageUrl = imageUrl.replace(/[\[\]"]/g, "");
+    imageUrl = cleanUrl(imageUrl);
   }
 
   return (
